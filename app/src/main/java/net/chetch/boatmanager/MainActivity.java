@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -79,6 +80,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
                 case CONNECTED:
                     hideProgress();
+                    findViewById(R.id.mainBody).setVisibility(View.VISIBLE);
                     Log.i("Main", "All connections made");
                     connected = true;
                     break;
@@ -98,7 +100,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
         viewPager.setAdapter(mainViewPagerAdapater);
 
         TabLayout tabLayout = findViewById(R.id.mainTabLayout);
-        String[] labels = new String[]{"Engines", "Pumps"};
+        String[] labels = new String[]{"Alarms", "Engines", "Pumps"};
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(labels[position]));
         tabLayoutMediator.attach();
 
