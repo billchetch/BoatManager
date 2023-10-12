@@ -20,6 +20,8 @@ include ':cmalarms'
 project(':cmalarms').projectDir=new File('/Users/billthorgerson/Documents/AndroidStudioProjects/AlarmPanel/cmalarms')
 include ':cmengineroom'
 project(':cmengineroom').projectDir=new File('/Users/billthorgerson/Documents/AndroidStudioProjects/EngineRoom2/cmengineroom')
+include ':cmarduino'
+project(':cmarduino').projectDir=new File('/Users/billthorgerson/Documents/AndroidStudioProjects/ArduinoLib/cmarduino')
 include ':messaging'
 project(':messaging').projectDir=new File('/Users/billthorgerson/Documents/AndroidStudioProjects/ChetchMessagingTest/messaging')
 include ':webservices'

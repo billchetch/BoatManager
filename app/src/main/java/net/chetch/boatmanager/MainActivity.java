@@ -17,6 +17,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import net.chetch.appframework.GenericActivity;
 import net.chetch.appframework.IDialogManager;
 import net.chetch.appframework.NotificationBar;
+import net.chetch.cmalarms.AlarmPanelFragment;
+import net.chetch.cmalarms.IAlarmPanelListener;
+import net.chetch.cmalarms.data.Alarm;
 import net.chetch.messaging.ClientConnection;
 import net.chetch.messaging.MessagingViewModel;
 import net.chetch.messaging.exceptions.MessagingServiceException;
@@ -35,7 +38,7 @@ import net.chetch.cmengineroom.models.EngineRoomMessagingModel;
 
 
 
-public class MainActivity extends GenericActivity implements NotificationBar.INotifiable{
+public class MainActivity extends GenericActivity implements NotificationBar.INotifiable, IAlarmPanelListener {
 
     static boolean connected = false;
     static boolean suppressConnectionErrors = false;
@@ -44,6 +47,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
     AlarmsMessagingModel aModel;
     EngineRoomMessagingModel erModel;
 
+    AlarmPanelFragment alarmPanelFragment;
 
     Observer connectProgress  = obj -> {
         showProgress();
@@ -114,7 +118,6 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                 }
             });
 
-
             erModel = ViewModelProviders.of(this).get(EngineRoomMessagingModel.class);
             erModel.getError().observe(this, throwable -> {
                 try {
@@ -124,7 +127,11 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                 }
             });
 
+
             try {
+                //Components
+
+
                 Logger.info("Main activity setting cm client names, adding modules and requesting connect ...");
                 aModel.setClientName("BMCMCAlarms", getApplicationContext());
                 erModel.setClientName("BMCMCEngineRoom", getApplicationContext());
@@ -195,13 +202,13 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
             ClientConnection client = aModel.getClient();
             s += client.getName() + " is of state " + client.getState() + lf;
-            MessagingViewModel.MessagingService messagingService = aModel.getMessaingService(EngineRoomMessageSchema.SERVICE_NAME);
+            MessagingViewModel.MessagingService messagingService = aModel.getMessaingService(AlarmsMessagingModel.SERVICE_NAME);
             s += messagingService.name + " service is of state " + messagingService.state + lf;
             s += "Last message received on: " + Utils.formatDate(messagingService.lastMessageReceivedOn, Webservice.DEFAULT_DATE_FORMAT);
 
             client = erModel.getClient();
             s += client.getName() + " is of state " + client.getState() + lf;
-            messagingService = erModel.getMessaingService(EngineRoomMessageSchema.SERVICE_NAME);
+            messagingService = erModel.getMessaingService(EngineRoomMessagingModel.SERVICE_NAME);
             s += messagingService.name + " service is of state " + messagingService.state + lf;
             s += "Last message received on: " + Utils.formatDate(messagingService.lastMessageReceivedOn, Webservice.DEFAULT_DATE_FORMAT);
 
@@ -214,6 +221,26 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
     @Override
     public void handleNotification(Object notifier, String tag, Object data) {
+
+    }
+
+    @Override
+    public void onAlarmStateChange(Alarm alarm, AlarmsMessageSchema.AlarmState newState, AlarmsMessageSchema.AlarmState oldState) {
+
+    }
+
+    @Override
+    public void onViewAlarmsLog(Alarm alarm) {
+
+    }
+
+    @Override
+    public void onSilenceAlarmBuzzer(int duration) {
+
+    }
+
+    @Override
+    public void onDisableAlarm(Alarm alarm) {
 
     }
 }

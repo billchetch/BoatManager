@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,13 +26,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".SettingsActivity"></activity>
+
         <activity
             android:exported="true"
             android:name="net.chetch.appframework.UCEActivity">
             <intent-filter>
-                <action android:name="net.chetch.captainslog.CLApplication.UNCAUGHT_EXCEPTION" />
+                <action android:name="net.chetch.boatmanager.BMApplication.UNCAUGHT_EXCEPTION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-    </application>>
+    </application>
 </manifest>
