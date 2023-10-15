@@ -47,8 +47,6 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
     AlarmsMessagingModel aModel;
     EngineRoomMessagingModel erModel;
 
-    AlarmPanelFragment alarmPanelFragment;
-
     Observer connectProgress  = obj -> {
         showProgress();
         if(obj instanceof WebserviceViewModel.LoadProgress) {
@@ -108,8 +106,12 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(labels[position]));
         tabLayoutMediator.attach();
 
+        NotificationBar.setView(findViewById(R.id.notificationbar), 100);
+
+        aModel = ViewModelProviders.of(this).get(AlarmsMessagingModel.class);
+        erModel = ViewModelProviders.of(this).get(EngineRoomMessagingModel.class);
+
         if(!connectManager.isConnected()) {
-            aModel = ViewModelProviders.of(this).get(AlarmsMessagingModel.class);
             aModel.getError().observe(this, throwable -> {
                 try {
                     handleError(throwable, aModel);
@@ -118,7 +120,6 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                 }
             });
 
-            erModel = ViewModelProviders.of(this).get(EngineRoomMessagingModel.class);
             erModel.getError().observe(this, throwable -> {
                 try {
                     handleError(throwable, erModel);
@@ -129,9 +130,6 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
 
             try {
-                //Components
-
-
                 Logger.info("Main activity setting cm client names, adding modules and requesting connect ...");
                 aModel.setClientName("BMCMCAlarms", getApplicationContext());
                 erModel.setClientName("BMCMCEngineRoom", getApplicationContext());
@@ -142,7 +140,6 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                 connectManager.setPermissableServerTimeDifference(5 * 60);
                 connectManager.requestConnect(connectProgress);
 
-                NotificationBar.setView(findViewById(R.id.notificationbar), 100);
                 NotificationBar.monitor(this, connectManager, "connection");
                 NotificationBar.monitor(this, erModel.dataEvent, "engine room data event");
 
@@ -153,9 +150,16 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
             //already connected so ensure things are hidden that might otherwise be displayed by default
             hideProgress();
             NotificationBar.hide();
+            findViewById(R.id.mainBody).setVisibility(View.VISIBLE);
         }
     }
 
+    public AlarmPanelFragment createAlarmPanelFragment(){
+        AlarmPanelFragment alarmPanelFragment = new AlarmPanelFragment();
+        alarmPanelFragment.listener = this;
+        alarmPanelFragment.horizontal = false;
+        return alarmPanelFragment;
+    }
     private String getStackTrace(Throwable t){
         String stackTrace = "";
         StackTraceElement[] st = t.getStackTrace();
@@ -224,6 +228,10 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
     }
 
+    public void onCreateAlarmPanel(AlarmPanelFragment fragment){
+        fragment.horizontal = false;
+    }
+
     @Override
     public void onAlarmStateChange(Alarm alarm, AlarmsMessageSchema.AlarmState newState, AlarmsMessageSchema.AlarmState oldState) {
 
@@ -241,6 +249,8 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
     @Override
     public void onDisableAlarm(Alarm alarm) {
-
+        showConfirmationDialog("Are you sure you want to disable " + alarm.getName() + "?", (dialog, which)->{
+            aModel.disableAlarm(alarm.getAlarmID());
+        });
     }
 }

@@ -12,7 +12,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 public class MainViewPagerAdapter extends FragmentStateAdapter {
 
-   public AlarmPanelFragment alarmPanelFragment;
    MainActivity mainActivity;
 
    public MainViewPagerAdapter(@NonNull MainActivity mainActivity) {
@@ -26,10 +25,7 @@ public class MainViewPagerAdapter extends FragmentStateAdapter {
       Fragment page = null;
       switch(position){
          case 0:
-            alarmPanelFragment = new AlarmPanelFragment();
-            alarmPanelFragment.horizontal = false;
-            alarmPanelFragment.listener = mainActivity;
-            page = alarmPanelFragment;
+            page = new AlarmPanelFragment();
             break;
          case 1:
             page = new EnginesFragment();
@@ -41,6 +37,7 @@ public class MainViewPagerAdapter extends FragmentStateAdapter {
 
       return page;
    }
+
 
    @Override
    public int getItemCount() {
