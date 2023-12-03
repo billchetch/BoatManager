@@ -3,6 +3,7 @@ package net.chetch.boatmanager;
 import android.os.Bundle;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.widget.ViewPager2;
@@ -45,7 +46,10 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
     static ConnectManager connectManager = new ConnectManager();
 
     AlarmsMessagingModel aModel;
+    MutableLiveData<Alarm> alarmLiveData = new MutableLiveData<>();
     EngineRoomMessagingModel erModel;
+
+    ViewPager2 viewPager;
 
     Observer connectProgress  = obj -> {
         showProgress();
@@ -98,8 +102,9 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
         includeActionBar(SettingsActivity.class);
 
         MainViewPagerAdapter mainViewPagerAdapater = new MainViewPagerAdapter(this);
-        ViewPager2 viewPager = findViewById(R.id.mainViewPager);
+        viewPager = findViewById(R.id.mainViewPager);
         viewPager.setAdapter(mainViewPagerAdapater);
+
 
         TabLayout tabLayout = findViewById(R.id.mainTabLayout);
         String[] labels = new String[]{"Alarms", "Engines", "Pumps"};
@@ -141,6 +146,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                 connectManager.requestConnect(connectProgress);
 
                 NotificationBar.monitor(this, connectManager, "connection");
+                NotificationBar.monitor(this, alarmLiveData, "alarm");
                 NotificationBar.monitor(this, erModel.dataEvent, "engine room data event");
 
             } catch (Exception e) {
@@ -225,7 +231,41 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
     @Override
     public void handleNotification(Object notifier, String tag, Object data) {
+        if(notifier instanceof ConnectManager){
+            ConnectManager cm = (ConnectManager)notifier;
+            switch(cm.getState()){
+                case CONNECTED:
+                    NotificationBar.show(NotificationBar.NotificationType.INFO, "Connected and ready to use.", null,5);
+                    break;
 
+                case ERROR:
+                    NotificationBar.show(NotificationBar.NotificationType.ERROR, "Service unavailable.");
+                    break;
+
+                case RECONNECT_REQUEST:
+                    NotificationBar.show(NotificationBar.NotificationType.WARNING, "Attempting to reconnect...");
+                    break;
+            }
+        } else if (notifier instanceof MutableLiveData) {
+            switch(tag){
+                case "alarm":
+                    Alarm alarm = (Alarm)data;
+                    String msg = null;
+                    switch(alarm.getAlarmState()){
+                        case OFF:
+                        case DISABLED:
+                            NotificationBar.hide();
+                            break;
+                        default:
+                            if(viewPager.getCurrentItem() > 0) { //i.e. we are not on alarms page
+                                msg = "Alarm " + alarm.getName() + " is of state " + alarm.getAlarmState();
+                                NotificationBar.show(NotificationBar.NotificationType.ALERT, msg);
+                            }
+                            break;
+                    }
+                    break;
+            }
+        }
     }
 
     public void onCreateAlarmPanel(AlarmPanelFragment fragment){
@@ -234,7 +274,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
     @Override
     public void onAlarmStateChange(Alarm alarm, AlarmsMessageSchema.AlarmState newState, AlarmsMessageSchema.AlarmState oldState) {
-
+        alarmLiveData.setValue(alarm);
     }
 
     @Override
