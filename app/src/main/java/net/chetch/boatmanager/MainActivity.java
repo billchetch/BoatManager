@@ -54,43 +54,12 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
     Observer connectProgress  = obj -> {
         showProgress();
         if(obj instanceof WebserviceViewModel.LoadProgress) {
-            WebserviceViewModel.LoadProgress progress = (WebserviceViewModel.LoadProgress) obj;
-            try {
-                String state = progress.startedLoading ? "Loading" : "Loaded";
-                String progressInfo = state + (progress.info == null ? "" : " " + progress.info.toLowerCase());
-                /*if(progress.dataLoaded != null){
-                    progressInfo += " - " + progress.dataLoaded.getClass().toString();
-                }*/
-                setProgressInfo(progressInfo);
-                Log.i("Main", "in load data progress ..." + progressInfo);
-
-            } catch (Exception e) {
-                Log.e("Main", "load progress: " + e.getMessage());
-            }
+            //do nothing
         } else if(obj instanceof ClientConnection){
-
+            //do nothing
         } else if(obj instanceof ConnectManager) {
-            ConnectManager cm = (ConnectManager) obj;
-            switch(cm.getState()){
-                case CONNECT_REQUEST:
-                    if(cm.fromError()){
-                        setProgressInfo("There was an error ... retrying...");
-                    } else {
-                        setProgressInfo("Connecting...");
-                    }
-                    break;
-
-                case RECONNECT_REQUEST:
-                    setProgressInfo("Disconnected!... Attempting to reconnect...");
-                    break;
-
-                case CONNECTED:
-                    hideProgress();
-                    findViewById(R.id.mainBody).setVisibility(View.VISIBLE);
-                    Log.i("Main", "All connections made");
-                    connected = true;
-                    break;
-            }
+            //ConnectManager cm = (ConnectManager) obj;
+            //do nothing
         }
     };
 
@@ -145,9 +114,9 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                 connectManager.setPermissableServerTimeDifference(5 * 60);
                 connectManager.requestConnect(connectProgress);
 
-                NotificationBar.monitor(this, connectManager, "connection");
-                NotificationBar.monitor(this, alarmLiveData, "alarm");
-                NotificationBar.monitor(this, erModel.dataEvent, "engine room data event");
+                //NotificationBar.monitor(this, connectManager, "connection");
+                //NotificationBar.monitor(this, alarmLiveData, "alarm");
+                //NotificationBar.monitor(this, erModel.dataEvent, "engine room data event");
 
             } catch (Exception e) {
                 showError(e);
@@ -177,27 +146,10 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
     }
 
     private void handleError(Throwable t, Object source){
-        if (suppressConnectionErrors && connected && (ConnectManager.isConnectionError(t) || t instanceof MessagingServiceException)) {
-            final String errMsg = t.getClass().getName() + "\n" + t.getMessage() + "\n" + t.getCause() + "\n" + getStackTrace(t);
-            SLog.e("MAIN", "Suppressed connection error: " + errMsg);
-            Logger.error("Suppressed connection error: " + errMsg);
-            NotificationBar.show(NotificationBar.NotificationType.ERROR,
-                    "An exception has occurred ...click for more details",
-                    t).setListener(new NotificationBar.INotificationListener() {
-                @Override
-                public void onClick(NotificationBar nb, NotificationBar.NotificationType ntype) {
-                    showError(errMsg);
-                }
-            });
-            return;
-        }
 
         String errMsg = "SCE: " + suppressConnectionErrors + ", CNCT: " + connected + ", ICE: " + ConnectManager.isConnectionError(t);
         errMsg += "\n" + t.getClass().getName() + "\n" + t.getMessage() + "\n" + t.getCause() + "\n" + getStackTrace(t);
-
-        showError(errMsg);
-
-        SLog.e("MAIN", t.getClass() + ": " + t.getMessage());
+        SLog.e("MAIN", errMsg);
     }
 
     @Override
@@ -215,6 +167,8 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
             MessagingViewModel.MessagingService messagingService = aModel.getMessaingService(AlarmsMessagingModel.SERVICE_NAME);
             s += messagingService.name + " service is of state " + messagingService.state + lf;
             s += "Last message received on: " + Utils.formatDate(messagingService.lastMessageReceivedOn, Webservice.DEFAULT_DATE_FORMAT);
+
+            s+= lf;
 
             client = erModel.getClient();
             s += client.getName() + " is of state " + client.getState() + lf;
@@ -252,7 +206,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
                     Alarm alarm = (Alarm)data;
                     String msg = null;
                     switch(alarm.getAlarmState()){
-                        case OFF:
+                        case LOWERED:
                         case DISABLED:
                             NotificationBar.hide();
                             break;

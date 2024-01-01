@@ -50,4 +50,5 @@ dependencies {
     implementation project(':messaging')
     implementation project(':cmengineroom')
     implementation project(':cmalarms')
+    implementation project(':cmarduino')
 }

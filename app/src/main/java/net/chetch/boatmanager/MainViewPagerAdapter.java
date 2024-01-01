@@ -2,12 +2,11 @@ package net.chetch.boatmanager;
 
 import net.chetch.cmalarms.AlarmPanelFragment;
 
-import net.chetch.cmengineroom.EnginesFragment;
-import net.chetch.cmengineroom.PumpsFragment;
+import net.chetch.cmengineroom.EnginesPageFragment;
+import net.chetch.cmengineroom.PumpsPageFragment;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 public class MainViewPagerAdapter extends FragmentStateAdapter {
@@ -28,10 +27,10 @@ public class MainViewPagerAdapter extends FragmentStateAdapter {
             page = new AlarmPanelFragment();
             break;
          case 1:
-            page = new EnginesFragment();
+            page = new EnginesPageFragment();
             break;
          case 2:
-            page = new PumpsFragment();
+            page = new PumpsPageFragment();
             break;
       }
 
