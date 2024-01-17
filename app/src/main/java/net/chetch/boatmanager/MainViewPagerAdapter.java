@@ -4,6 +4,7 @@ import net.chetch.cmalarms.AlarmPanelFragment;
 
 import net.chetch.cmengineroom.EnginesPageFragment;
 import net.chetch.cmengineroom.PumpsPageFragment;
+import net.chetch.cmengineroom.WaterTanksPageFragment;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -32,6 +33,9 @@ public class MainViewPagerAdapter extends FragmentStateAdapter {
          case 2:
             page = new PumpsPageFragment();
             break;
+         case 3:
+            page = new WaterTanksPageFragment();
+            break;
       }
 
       return page;
@@ -40,6 +44,6 @@ public class MainViewPagerAdapter extends FragmentStateAdapter {
 
    @Override
    public int getItemCount() {
-      return 3;
+      return 4;
    }
 }

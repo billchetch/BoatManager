@@ -21,7 +21,9 @@ import net.chetch.appframework.NotificationBar;
 import net.chetch.cmalarms.AlarmPanelFragment;
 import net.chetch.cmalarms.IAlarmPanelListener;
 import net.chetch.cmalarms.data.Alarm;
+import net.chetch.cmengineroom.data.Engine;
 import net.chetch.messaging.ClientConnection;
+import net.chetch.messaging.Message;
 import net.chetch.messaging.MessagingViewModel;
 import net.chetch.messaging.exceptions.MessagingServiceException;
 import net.chetch.utilities.Logger;
@@ -37,6 +39,7 @@ import net.chetch.cmalarms.models.AlarmsMessagingModel;
 import net.chetch.cmengineroom.models.EngineRoomMessageSchema;
 import net.chetch.cmengineroom.models.EngineRoomMessagingModel;
 
+import java.lang.reflect.Method;
 
 
 public class MainActivity extends GenericActivity implements NotificationBar.INotifiable, IAlarmPanelListener {
@@ -66,6 +69,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         includeActionBar(SettingsActivity.class);
@@ -76,7 +80,7 @@ public class MainActivity extends GenericActivity implements NotificationBar.INo
 
 
         TabLayout tabLayout = findViewById(R.id.mainTabLayout);
-        String[] labels = new String[]{"Alarms", "Engines", "Pumps"};
+        String[] labels = new String[]{"Alarms", "Engines", "Pumps", "Water Tanks"};
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(labels[position]));
         tabLayoutMediator.attach();
 
